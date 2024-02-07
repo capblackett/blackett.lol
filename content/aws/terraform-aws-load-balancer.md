@@ -4,7 +4,18 @@ date = 2024-02-06T20:16:08Z
 draft = false
 +++
 
-## About
+## Contents
+- [About](About)
+- [0 - Prereqs](#0-Prereqs)
+- [1 - Setup](#1-Setup)
+- [2 - VPCs & Subnets](#2-vpc&sub)
+- [3 - NAT & Gateways](#3-NAT&Gate)
+- [4 - Load Balancer](#4-ELB)
+- [5 - Auto-Scaling](#5-ASG)
+- [6 - Security Groups](#6-SGs)
+- [7 - Deploy & Troubleshoot](#7-troubleshooting)
+
+## About {#About}
 
 This guide assumes you have already [installed](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) and [configured](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.htm) the AWS CLI and have [Terraform installed on your computer](https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli). Throughout the guide are code snippets from the files in this project. To keep you on your toes they require you to input your resource names etc. No brainless copy/paste allowed.
 
@@ -33,7 +44,7 @@ This guide assumes you have already [installed](https://docs.aws.amazon.com/cli/
 
 ---
 
-## 1 - Project Setup
+## 1 - Project Setup {#1-Setup}
 
 After creating the project's root directory create the `main.tf` file and add the provider for AWS:
 
@@ -76,7 +87,7 @@ With your state file safely locked away from prying eyes, go ahead and run `terr
 
 ---
 
-## 2 - Configuring The VPC & Subnets
+## 2 - Configuring The VPC & Subnets {#2-vpc&sub}
 
 The project requires a VPC with two public subnets and one private subnet. This is covered in the "Architecture" section of the repo's [readme](../README.md).
 
@@ -134,7 +145,7 @@ resource "aws_subnet" "<subnet3-name-here>" {
 ```
 ---
 
-## 3 - NAT Gateway & Route Tables
+## 3 - NAT Gateway & Route Tables {#3-NAT&Gate}
 
 I've split this part into two files, `gateways-public.tf` and `gateways-private.tf`. Let's start with setting up the public gateway. This will allow the load balancer to communicate on the public internet so users can access the services and resources behind it.
 
@@ -242,7 +253,7 @@ As before, we create the route table association resource then specify that our 
 
 ---
 
-## 4 - Load Balancer
+## 4 - Load Balancer {#4-ELB}
 
 The load balancer (LB) will balance traffic between all targets in the target group. Because we're balancing traffic for specific port numbers we'll use an application laod balancer. Start by setting up `load-balancer.tf`:
 
@@ -292,7 +303,7 @@ Port 80 is used by the HTTP protocol. You should know this already if you're goi
 
 ---
 
-## 5 - Auto Scaling
+## 5 - Auto Scaling {#5-ASG}
 
 In this step we'll create an auto scaling group (ASG) to create the EC2 instances. To configure the EC2s we'll use a launch template.
 
@@ -393,7 +404,7 @@ So all in all this bash script will update the EC2 instance's OS, install Apache
 
 ---
 
-## 6 - Security Groups
+## 6 - Security Groups {#6-SGs}
 
 Finally, we need to allow traffic to pass through our load balancer. This is done by applying security groups to the various services.
 
@@ -497,7 +508,7 @@ As `protocol` is set to `-1`, the `from_port` and `to_port` must be set to 0.
 
 ---
 
-## 7 - Deploying & Troubleshooting
+## 7 - Deploying & Troubleshooting {#7-troubleshooting}
 
 ### 7.1 - Terraform
 
