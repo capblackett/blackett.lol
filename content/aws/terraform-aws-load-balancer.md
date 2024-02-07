@@ -8,10 +8,10 @@ draft = false
 
 This guide assumes you have already [installed](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) and [configured](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.htm) the AWS CLI and have [Terraform installed on your computer](https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli). Throughout the guide are code snippets from the files in this project. To keep you on your toes they require you to input your resource names etc. No brainless copy/paste allowed.
 
- ## Prerequisite Knowledge {#0 - Prerequisite Knowledge}
+
 
 ---
-## 0 - Prerequisite Knowledge
+## 0 - Prerequisite Knowledge {#0-Prereqs}
 
 - Networking
     - [Public/private networking](https://simple.wikipedia.org/wiki/IP_address)
