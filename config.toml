@@ -1,0 +1,40 @@
+baseURL = 'http://blackett.lol/'
+languageCode = 'en-gb'
+theme = "nightfall"
+
+[menu]
+  [[menu.header]]
+    name = "posts"
+    weight = 0
+    url = "posts"
+  [[menu.header]]
+    name = "about"
+    weight = 1
+    url = "about"
+  [[menu.header]]
+    name = "aws"
+    weight = 0
+    url = "aws"
+
+[params]
+user = "cap"
+hostname = "blackett.lol"
+footerHtml = 'do not contact me about anything on this site lol'
+  [params.author]
+    name = "blackett"  # Website and RSS feed author
+    email = "cap@blackett.lol"  # RSS feed email address
+
+readingTime = true  # Show reading time on post page
+published = true  # Show published data on post page
+
+
+#[[params.social]]
+#key = 0
+#name = "github"
+#url = "https://github.com/gohugoio"
+
+[[params.social]]
+key = 0
+name = "ahoy there"
+url = ""
+
