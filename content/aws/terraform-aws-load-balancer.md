@@ -4,8 +4,11 @@ date = 2024-02-06T20:16:08Z
 draft = false
 +++
 
+## About {#About}
+
+This guide assumes you have already [installed](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) and [configured](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.htm) the AWS CLI and have [Terraform installed on your computer](https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli). Throughout the guide are code snippets from the files in this project. To keep you on your toes they require you to input your resource names etc. No brainless copy/paste allowed.
+
 ## Contents
-- [About](About)
 - [0 - Prereqs](#0-Prereqs)
 - [1 - Setup](#1-Setup)
 - [2 - VPCs & Subnets](#2-vpc&sub)
@@ -14,12 +17,6 @@ draft = false
 - [5 - Auto-Scaling](#5-ASG)
 - [6 - Security Groups](#6-SGs)
 - [7 - Deploy & Troubleshoot](#7-troubleshooting)
-
-## About {#About}
-
-This guide assumes you have already [installed](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) and [configured](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.htm) the AWS CLI and have [Terraform installed on your computer](https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli). Throughout the guide are code snippets from the files in this project. To keep you on your toes they require you to input your resource names etc. No brainless copy/paste allowed.
-
-
 
 ---
 ## 0 - Prerequisite Knowledge {#0-Prereqs}
