@@ -23,10 +23,16 @@ So where do you start? You've got to start _somewhere,_ right? Well buckle up ki
 
 ----
 
-## Why Learn This Way? {#1-why}
+## 1 - Why Learn This Way? {#1-why}
 
 Why not learn hacking first? Hacking is what you want to do, right? Well what are you going to hack, sir? If you eventually land a job as a [penetration tester](https://www.cloudflare.com/en-gb/learning/security/glossary/what-is-penetration-testing/) you will be attacking business infrastructure to help a security team find flaws in their security plans.
 
-Here's a fun one to try. Can you find the fault in the blueprint below?
+Here's a fun one to try. Can you find the fault in the diagram below?
 
+![Game Boy diagram](/img/gameboy1.gif)
 
+It's a bit of a difficult thing to do if you don't know what the diagram shows. Some kind of circuit? Electronics, maybe? Well, similarly you wouldn't know how to start looking for flaws in a computer system or network if you aren't already deeply familiar with systems and networks. Oh, and the diagram has no flaws. You would only have spotted that if you knew what the circuit was for. Teehee :^)
+
+----
+
+## 2 - Getting Started {#2-start}
