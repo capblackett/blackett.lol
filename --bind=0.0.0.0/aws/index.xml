@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title></title>
+    <link>http://localhost:1313/aws/</link>
+    <description>Recent content on </description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-gb</language>
+    <managingEditor>cap@blackett.lol (blackett)</managingEditor>
+    <webMaster>cap@blackett.lol (blackett)</webMaster>
+    <lastBuildDate>Tue, 06 Feb 2024 20:16:08 +0000</lastBuildDate>
+    <atom:link href="http://localhost:1313/aws/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Terraforming a Load Balancer in AWS</title>
+      <link>http://localhost:1313/aws/terraform-aws-load-balancer/</link>
+      <pubDate>Tue, 06 Feb 2024 20:16:08 +0000</pubDate><author>cap@blackett.lol (blackett)</author>
+      <guid>http://localhost:1313/aws/terraform-aws-load-balancer/</guid>
+      <description>About This guide assumes you have already installed and configured the AWS CLI and have Terraform installed on your computer. Throughout the guide are code snippets from the files in this project. To keep you on your toes they require you to input your resource names etc. No brainless copy/paste allowed.&#xA;Contents 0 - Prereqs 1 - Setup 2 - VPCs &amp;amp; Subnets 3 - NAT &amp;amp; Gateways 4 - Load Balancer 5 - Auto-Scaling 6 - Security Groups 7 - Deploy &amp;amp; Troubleshoot 0 - Prerequisite Knowledge Networking Public/private networking Subnets Routing NAT Network Ports AWS EC2 basics Elastic Load Balancers Auto Scaling Groups AWS Networking (Elastic IP, NAT Gateways, Route tables) Terraform Working with AWS GitHub Basic operation .</description>
+    </item>
+  </channel>
+</rss>
