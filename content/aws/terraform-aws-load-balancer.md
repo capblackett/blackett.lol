@@ -11,8 +11,8 @@ This guide assumes you have already [installed](https://docs.aws.amazon.com/cli/
 ## Contents
 - [0 - Prereqs](#0-Prereqs)
 - [1 - Setup](#1-Setup)
-- [2 - VPCs & Subnets](#2-vpc&sub)
-- [3 - NAT & Gateways](#3-NAT&Gate)
+- [2 - VPCs & Subnets](#2-vpc-sub)
+- [3 - NAT & Gateways](#3-NAT-Gate)
 - [4 - Load Balancer](#4-ELB)
 - [5 - Auto-Scaling](#5-ASG)
 - [6 - Security Groups](#6-SGs)
@@ -84,7 +84,7 @@ With your state file safely locked away from prying eyes, go ahead and run `terr
 
 ---
 
-## 2 - Configuring The VPC & Subnets {#2-vpc&sub}
+## 2 - Configuring The VPC & Subnets {#2-vpc-sub}
 
 The project requires a VPC with two public subnets and one private subnet. This is covered in the "Architecture" section of the repo's [readme](../README.md).
 
@@ -142,7 +142,7 @@ resource "aws_subnet" "<subnet3-name-here>" {
 ```
 ---
 
-## 3 - NAT Gateway & Route Tables {#3-NAT&Gate}
+## 3 - NAT Gateway & Route Tables {#3-NAT-Gate}
 
 I've split this part into two files, `gateways-public.tf` and `gateways-private.tf`. Let's start with setting up the public gateway. This will allow the load balancer to communicate on the public internet so users can access the services and resources behind it.
 
