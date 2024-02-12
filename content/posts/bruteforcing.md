@@ -1,7 +1,7 @@
 +++
 title = 'Brute Forcing'
 date = 2024-02-12T20:45:00Z
-draft = true
+draft = false
 +++
 
 ### Ahhh... brute forcing, my old friend...
