@@ -19,7 +19,7 @@ theme = "nightfall"
 [params]
 user = "cap"
 hostname = "blackett.lol"
-footerHtml = 'do not contact me about anything on this site lol'
+footerHtml = 'when in doubt search the web'
   [params.author]
     name = "blackett"  # Website and RSS feed author
     email = "cap@blackett.lol"  # RSS feed email address
