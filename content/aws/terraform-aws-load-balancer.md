@@ -8,7 +8,9 @@ draft = false
 
 This guide assumes you have already [installed](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) and [configured](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.htm) the AWS CLI and have [Terraform installed on your computer](https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli). Throughout the guide are code snippets from the files in this project. To keep you on your toes they require you to input your resource names etc. No brainless copy/paste allowed.
 
-## Contents
+This proejct was adapted from [a blog post](https://sharmilas.medium.com/a-step-by-step-guide-to-creating-load-balancer-and-ec2-with-auto-scaling-group-using-terraform-752afd44df8e) by Sharmila S. I went through the project myself and wrote this guide to solidify my understanding of how infrastructure on AWS can be deployed via Terraform.
+
+## Contents {#contents}
 - [0 - Prereqs](#0-Prereqs)
 - [1 - Setup](#1-Setup)
 - [2 - VPCs & Subnets](#2-vpc-sub)
@@ -82,11 +84,13 @@ terraform {
 
 With your state file safely locked away from prying eyes, go ahead and run `terraform init` to initalise the project by downloading the specified providers.
 
+[\^top](#contents)
+
 ---
 
 ## 2 - Configuring The VPC & Subnets {#2-vpc-sub}
 
-The project requires a VPC with two public subnets and one private subnet. This is covered in the "Architecture" section of the repo's [readme](../README.md).
+The project requires a VPC with two public subnets and one private subnet.
 
 As this project involves several moving parts it's best to keep things organised. This is best done by having separate `.tf` files for each aspect. Create the `vpc-with-subnets.tf` file and add the block for the first subnet.
 
@@ -140,6 +144,9 @@ resource "aws_subnet" "<subnet3-name-here>" {
   availability_zone       = "<your-region-here>"
 }
 ```
+
+[\^top](#contents)
+
 ---
 
 ## 3 - NAT Gateway & Route Tables {#3-NAT-Gate}
@@ -248,6 +255,8 @@ As before, we create the route table association resource then specify that our 
 
 </details>
 
+[\^top](#contents)
+
 ---
 
 ## 4 - Load Balancer {#4-ELB}
@@ -297,6 +306,8 @@ resource "aws_lb_listener" "<lbl-name-here>" {
 Port 80 is used by the HTTP protocol. You should know this already if you're going to start learning cloud engineering.
 
 </details>
+
+[\^top](#contents)
 
 ---
 
@@ -398,6 +409,8 @@ And finally the last line sends some HTML code to the default site location for 
 So all in all this bash script will update the EC2 instance's OS, install Apache, start Apache and set it to start on boot, then create a simple HTML document containing the fully qualified domain name of the EC2 instance.
 
 </details>
+
+[\^top](#contents)
 
 ---
 
@@ -503,6 +516,8 @@ As `protocol` is set to `-1`, the `from_port` and `to_port` must be set to 0.
 
 </details>
 
+[\^top](#contents)
+
 ---
 
 ## 7 - Deploying & Troubleshooting {#7-troubleshooting}
@@ -538,3 +553,5 @@ There's rarely a one-size-fits-all way to write troubleshooting for projects, so
 - Don't think of error messages as locks for which you need to find a key. Error messages are puzzles with hints on how to solve them. Try to understand what error messages mean, combine this with understanding what each piece connects to and how it works to make troubleshooting a breeze.
 - Take things slowly and think through the code as though one step at a time. What is each part doing and why?
 - When in doubt, Google search your query in simple terms. If you don't understand that, ask others for help via forums or online chat groups. Learn how to ask a Really Good Question. 
+
+[\^top](#contents)
