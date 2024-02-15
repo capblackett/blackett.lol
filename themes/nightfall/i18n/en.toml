@@ -1,17 +1,17 @@
 [not_found]
-    other = "NOT FOUND"
+    other = "page not found"
 
 [not_found_desc]
-    other = "You just hit a route that doesn't exist..."
+    other = "the requested page does not exist oopsie woopsie teehee"
 
 [home]
     other = "Home"
 
 [published]
-    other = "published"
+    other = "posted"
 
 [reading_time]
-    other = "reading time"
+    other = "read time"
 
 [reading_time_desc]
   one = "1 minute"
