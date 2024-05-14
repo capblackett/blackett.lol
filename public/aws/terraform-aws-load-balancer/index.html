@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en-gb">
+
+<head>
+    <title>
+Terraforming a Load Balancer in AWS | blackett
+</title>
+
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name = "description" content = "">
+
+<meta name="generator" content="Hugo 0.125.7">
+
+
+<link rel="canonical" href="http://blackett.lol/aws/terraform-aws-load-balancer/" >
+<link href="/sass/main.min.55ebc964d1f2345e818fc19bcfbf8da6663bb551c6d04310c658e3b0c90a85cc.css" rel="stylesheet">
+
+
+
+
+</head>
+
+<body>
+
+    <div class="flexWrapper">
+        <header class="headerWrapper">
+    <div class="header">
+        <div>
+            <a href="http://blackett.lol/">
+                <span class="terminal">cap@blackett.lol ~ $</span>
+            </a>
+        </div>
+        <input class="side-menu" type="checkbox" id="side-menu">
+        <label class="hamb" for="side-menu"><span class="hamb-line"></span></label>
+        <nav class="headerLinks">
+            <ul>
+                
+                <li>
+                    <a href="http://blackett.lol/about" title="" >
+                        ~/about</a>
+                </li>
+                
+                <li>
+                    <a href="http://blackett.lol/aws" title="" >
+                        ~/aws</a>
+                </li>
+                
+                <li>
+                    <a href="http://blackett.lol/posts" title="" >
+                        ~/posts</a>
+                </li>
+                
+            </ul>
+        </nav>
+    </div>
+</header>
+
+
+        <div class="content">
+            <main class="main">
+                
+<div class="postWrapper">
+    <h1>Terraforming a Load Balancer in AWS</h1>
+    
+    
+    <section class="postMetadata">
+        <dl>
+            
+            
+            
+            
+                <dt>posted</dt>
+                
+                <dd><time datetime="2024-02-06">February 6, 2024</time></dd>
+            
+            
+                <dt>read time</dt>
+                <dd>14 minutes</dd>
+            
+        </dl>
+    </section>
+    
+    <div>
+        <h2 id="About">About</h2>
+<p>This guide assumes you have already <a href="https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html">installed</a> and <a href="https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.htm">configured</a> the AWS CLI and have <a href="https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli">Terraform installed on your computer</a>. Throughout the guide are code snippets from the files in this project. To keep you on your toes they require you to input your resource names etc. No brainless copy/paste allowed.</p>
+<p>This proejct was adapted from <a href="https://sharmilas.medium.com/a-step-by-step-guide-to-creating-load-balancer-and-ec2-with-auto-scaling-group-using-terraform-752afd44df8e">a blog post</a> by Sharmila S. I went through the project myself and wrote this guide to solidify my understanding of how infrastructure on AWS can be deployed via Terraform.</p>
+<h2 id="contents">Contents</h2>
+<ul>
+<li><a href="#0-Prereqs">0 - Prereqs</a></li>
+<li><a href="#1-Setup">1 - Setup</a></li>
+<li><a href="#2-vpc-sub">2 - VPCs &amp; Subnets</a></li>
+<li><a href="#3-NAT-Gate">3 - NAT &amp; Gateways</a></li>
+<li><a href="#4-ELB">4 - Load Balancer</a></li>
+<li><a href="#5-ASG">5 - Auto-Scaling</a></li>
+<li><a href="#6-SGs">6 - Security Groups</a></li>
+<li><a href="#7-troubleshooting">7 - Deploy &amp; Troubleshoot</a></li>
+</ul>
+<hr>
+<h2 id="0-Prereqs">0 - Prerequisite Knowledge</h2>
+<ul>
+<li>Networking
+<ul>
+<li><a href="https://simple.wikipedia.org/wiki/IP_address">Public/private networking</a></li>
+<li><a href="https://www.dummies.com/article/technology/information-technology/networking/general-networking/network-administration-subnet-basics-184551/">Subnets</a></li>
+<li><a href="https://www.dummies.com/article/technology/information-technology/networking/general-networking/network-basics-routers-185331/">Routing</a></li>
+<li><a href="https://www.computernetworkingnotes.com/ccna-study-guide/basic-concepts-of-nat-explained-in-easy-language.html">NAT</a></li>
+<li><a href="https://simple.wikipedia.org/wiki/Network_port">Network Ports</a></li>
+</ul>
+</li>
+<li>AWS
+<ul>
+<li><a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/concepts.html">EC2 basics</a></li>
+<li><a href="https://docs.aws.amazon.com/elasticloadbalancing/latest/userguide/what-is-load-balancing.html">Elastic Load Balancers</a></li>
+<li><a href="https://docs.aws.amazon.com/autoscaling/ec2/userguide/auto-scaling-groups.html">Auto Scaling Groups</a></li>
+<li>AWS Networking (<a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/elastic-ip-addresses-eip.html">Elastic IP</a>, <a href="https://docs.aws.amazon.com/vpc/latest/userguide/vpc-nat-gateway.html">NAT Gateways</a>, <a href="https://docs.aws.amazon.com/vpc/latest/userguide/VPC_Route_Tables.html">Route tables</a>)</li>
+</ul>
+</li>
+<li>Terraform
+<ul>
+<li><a href="https://developer.hashicorp.com/terraform/tutorials/aws-get-started">Working with AWS</a></li>
+</ul>
+</li>
+<li>GitHub
+<ul>
+<li><a href="https://docs.github.com/en/get-started/quickstart/hello-world">Basic operation</a></li>
+<li><a href="https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files">.gitignore file</a></li>
+<li><a href="https://docs.github.com/en/actions/learn-github-actions/understanding-github-actions">GitHub Actions</a></li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="1-Setup">1 - Project Setup</h2>
+<p>After creating the project&rsquo;s root directory create the <code>main.tf</code> file and add the provider for AWS:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-hcl" data-lang="hcl"><span style="display:flex;"><span><span style="color:#66d9ef">terraform</span> {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">required_providers</span> {
+</span></span><span style="display:flex;"><span>    aws <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>      source  <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;hashicorp/aws&#34;</span>
+</span></span><span style="display:flex;"><span>      version <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;~&gt;4.0&#34;</span>
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>The provider will need configured to use the region in which the project will be deployed. If you have set up the AWS CLI with your access keys then Terraform should pick these up. Otherwise these can be specified here:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-hcl" data-lang="hcl"><span style="display:flex;"><span><span style="color:#66d9ef">provider</span> <span style="color:#e6db74">&#34;aws&#34;</span> {
+</span></span><span style="display:flex;"><span>  region                   <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&lt;your-region-here&gt;&#34;</span>
+</span></span><span style="display:flex;"><span>  shared_config_files      <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#34;/Path/to/.aws/config&#34;</span>]
+</span></span><span style="display:flex;"><span>  shared_credentials_files <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#34;/Path/to/.aws/credentials&#34;</span>]
+</span></span><span style="display:flex;"><span>  profile                  <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;PROFILE&#34;</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>If you haven&rsquo;t already set up a <code>.gitignore</code> file, do so now and add the Terraform state files to it or copy GitHub&rsquo;s <a href="https://github.com/github/gitignore/blob/main/Terraform.gitignore">Terraform.gitignore template</a>. It is bad practice to <a href="https://developer.hashicorp.com/terraform/language/state/sensitive-data">store the state files somewhere public</a>. If you&rsquo;re a madlad who likes his or her S3 buckets then add the following code to <code>main.tf</code> to store the state in an existing, private S3 bucket:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-hcl" data-lang="hcl"><span style="display:flex;"><span><span style="color:#66d9ef">terraform</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">backend</span> <span style="color:#e6db74">&#34;s3&#34;</span> {
+</span></span><span style="display:flex;"><span>      bucket <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&lt;your-bucket-here&gt;&#34;</span>
+</span></span><span style="display:flex;"><span>      region <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&lt;your-region-here&gt;&#34;</span>
+</span></span><span style="display:flex;"><span>      key    <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;path/to/directory&#34;</span>
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>With your state file safely locked away from prying eyes, go ahead and run <code>terraform init</code> to initalise the project by downloading the specified providers.</p>
+<p><a href="#contents">^top</a></p>
+<hr>
+<h2 id="2-vpc-sub">2 - Configuring The VPC &amp; Subnets</h2>
+<p>The project requires a VPC with two public subnets and one private subnet.</p>
+<p>As this project involves several moving parts it&rsquo;s best to keep things organised. This is best done by having separate <code>.tf</code> files for each aspect. Create the <code>vpc-with-subnets.tf</code> file and add the block for the first subnet.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-hcl" data-lang="hcl"><span style="display:flex;"><span><span style="color:#66d9ef">resource</span> <span style="color:#e6db74">&#34;aws_vpc&#34; &#34;&lt;vpc-name-here&gt;&#34;</span> {
+</span></span><span style="display:flex;"><span>  cidr_block <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;10.0.0.0/23&#34;</span>
+</span></span><span style="display:flex;"><span>  tags <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>    Name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&lt;vpc-name-here&gt;&#34;</span>
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>I&rsquo;ve given it a nice big /23 subnet, but for production environments you&rsquo;ll have to consider how many addresses you&rsquo;ll actually need.</p>
+<p>Next, add in the subnet code block for the first public subnet:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-hcl" data-lang="hcl"><span style="display:flex;"><span><span style="color:#66d9ef">resource</span> <span style="color:#e6db74">&#34;aws_subnet&#34; &#34;&lt;subnet1-name-here&gt;&#34;</span> {
+</span></span><span style="display:flex;"><span>  vpc_id                  <span style="color:#f92672">=</span> <span style="color:#66d9ef">aws_vpc</span>.<span style="color:#960050;background-color:#1e0010">&lt;</span><span style="color:#66d9ef">vpc</span><span style="color:#960050;background-color:#1e0010">-</span><span style="color:#66d9ef">name</span><span style="color:#960050;background-color:#1e0010">-</span><span style="color:#66d9ef">here</span><span style="color:#960050;background-color:#1e0010">&gt;</span>.<span style="color:#66d9ef">id</span>
+</span></span><span style="display:flex;"><span>  cidr_block              <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;10.0.0.0/27&#34;</span>
+</span></span><span style="display:flex;"><span>  map_public_ip_on_launch <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>
+</span></span><span style="display:flex;"><span>  availability_zone       <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&lt;your-region-here&gt;&#34;</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>Note that the subnet size is smaller (this is a subnet of the VPC subnet) and that <code>map_public_ip_on_launch</code> is set to <code>true</code> as this subnet is to be public. Add the second subnet code block changing the details where appropriate. See if you can figure it out on your own using your networking knowledge.</p>
+<!-- raw HTML omitted -->
+<p>The second subnet starts after the end of the first subnet. The mask is a /27 which gives us 32 addresses. Starting at address 0, the next subnet begins at 10.0.0.32. The subnet name is different to the first subnet and <code>map_public_ip_on_launch</code> is set to <code>true</code>.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-hcl" data-lang="hcl"><span style="display:flex;"><span><span style="color:#66d9ef">resource</span> <span style="color:#e6db74">&#34;aws_subnet&#34; &#34;&lt;subnet2-name-here&gt;&#34;</span> {
+</span></span><span style="display:flex;"><span>  vpc_id                  <span style="color:#f92672">=</span> <span style="color:#66d9ef">aws_vpc</span>.<span style="color:#960050;background-color:#1e0010">&lt;</span><span style="color:#66d9ef">vpc</span><span style="color:#960050;background-color:#1e0010">-</span><span style="color:#66d9ef">name</span><span style="color:#960050;background-color:#1e0010">-</span><span style="color:#66d9ef">here</span><span style="color:#960050;background-color:#1e0010">&gt;</span>.<span style="color:#66d9ef">id</span>
+</span></span><span style="display:flex;"><span>  cidr_block              <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;10.0.0.32/27&#34;</span>
+</span></span><span style="display:flex;"><span>  map_public_ip_on_launch <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>
+</span></span><span style="display:flex;"><span>  availability_zone       <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&lt;your-region-here&gt;&#34;</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>Hopefull you&rsquo;re just here checking your work, if not then never mind champ you&rsquo;ll get it next time. I believe in you.</p>
+<!-- raw HTML omitted -->
+<p>Finally, add the private subnet code block. Note <code>map_public_ip_on_launch</code> is set to <code>false</code> this time. Why might that be?</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-hcl" data-lang="hcl"><span style="display:flex;"><span><span style="color:#66d9ef">resource</span> <span style="color:#e6db74">&#34;aws_subnet&#34; &#34;&lt;subnet3-name-here&gt;&#34;</span> {
+</span></span><span style="display:flex;"><span>  vpc_id                  <span style="color:#f92672">=</span> <span style="color:#66d9ef">aws_vpc</span>.<span style="color:#960050;background-color:#1e0010">&lt;</span><span style="color:#66d9ef">vpc</span><span style="color:#960050;background-color:#1e0010">-</span><span style="color:#66d9ef">name</span><span style="color:#960050;background-color:#1e0010">-</span><span style="color:#66d9ef">here</span><span style="color:#960050;background-color:#1e0010">&gt;</span>.<span style="color:#66d9ef">id</span>
+</span></span><span style="display:flex;"><span>  cidr_block              <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;10.0.1.0/27&#34;</span>
+</span></span><span style="display:flex;"><span>  map_public_ip_on_launch <span style="color:#f92672">=</span> <span style="color:#66d9ef">false</span>
+</span></span><span style="display:flex;"><span>  availability_zone       <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&lt;your-region-here&gt;&#34;</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p><a href="#contents">^top</a></p>
+<hr>
+<h2 id="3-NAT-Gate">3 - NAT Gateway &amp; Route Tables</h2>
+<p>I&rsquo;ve split this part into two files, <code>gateways-public.tf</code> and <code>gateways-private.tf</code>. Let&rsquo;s start with setting up the public gateway. This will allow the load balancer to communicate on the public internet so users can access the services and resources behind it.</p>
+<h3 id="31---public-gateway">3.1 - Public Gateway</h3>
+<p>Create <code>gateways-public.tf</code>, define the Internet Gateway, and place it in the VPC we created in the previous step:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-hcl" data-lang="hcl"><span style="display:flex;"><span><span style="color:#66d9ef">resource</span> <span style="color:#e6db74">&#34;aws_internet_gateway&#34; &#34;&lt;gw1-name-here&gt;&#34;</span> {
+</span></span><span style="display:flex;"><span>  vpc_id <span style="color:#f92672">=</span> <span style="color:#66d9ef">aws_vpc</span>.<span style="color:#960050;background-color:#1e0010">&lt;</span><span style="color:#66d9ef">vpc</span><span style="color:#960050;background-color:#1e0010">-</span><span style="color:#66d9ef">name</span><span style="color:#960050;background-color:#1e0010">-</span><span style="color:#66d9ef">here</span><span style="color:#960050;background-color:#1e0010">&gt;</span>.<span style="color:#66d9ef">id</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>Now add in the code block for creating the route table. This requires the VPC ID, the route(s) it will hold, and the ID of the gateway it will sit on.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-hcl" data-lang="hcl"><span style="display:flex;"><span><span style="color:#66d9ef">resource</span> <span style="color:#e6db74">&#34;aws_route_table&#34; &#34;&lt;rt1-name-here&gt;&#34;</span> {
+</span></span><span style="display:flex;"><span>  vpc_id <span style="color:#f92672">=</span> <span style="color:#66d9ef">aws_vpc</span>.<span style="color:#960050;background-color:#1e0010">&lt;</span><span style="color:#66d9ef">vpc</span><span style="color:#960050;background-color:#1e0010">-</span><span style="color:#66d9ef">name</span><span style="color:#960050;background-color:#1e0010">-</span><span style="color:#66d9ef">here</span><span style="color:#960050;background-color:#1e0010">&gt;</span>.<span style="color:#66d9ef">id</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">route</span> {
+</span></span><span style="display:flex;"><span>    cidr_block <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;0.0.0.0/0&#34;</span>
+</span></span><span style="display:flex;"><span>    gateway_id <span style="color:#f92672">=</span> <span style="color:#66d9ef">aws_internet_gateway</span>.<span style="color:#960050;background-color:#1e0010">&lt;</span><span style="color:#66d9ef">gw1</span><span style="color:#960050;background-color:#1e0010">-</span><span style="color:#66d9ef">name</span><span style="color:#960050;background-color:#1e0010">-</span><span style="color:#66d9ef">here</span><span style="color:#960050;background-color:#1e0010">&gt;</span>.<span style="color:#66d9ef">id</span>
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>The gateway and route table are looking very nice but won&rsquo;t do anything until the table is attached to a subnet. The following code block associates the route table to our first public subnet:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-hcl" data-lang="hcl"><span style="display:flex;"><span><span style="color:#66d9ef">resource</span> <span style="color:#e6db74">&#34;aws_route_table_association&#34; &#34;&lt;rta1-name-here&gt;&#34;</span> {
+</span></span><span style="display:flex;"><span>  subnet_id      <span style="color:#f92672">=</span> <span style="color:#66d9ef">aws_subnet</span>.<span style="color:#960050;background-color:#1e0010">&lt;</span><span style="color:#66d9ef">subnet1</span><span style="color:#960050;background-color:#1e0010">-</span><span style="color:#66d9ef">name</span><span style="color:#960050;background-color:#1e0010">-</span><span style="color:#66d9ef">here</span><span style="color:#960050;background-color:#1e0010">&gt;</span>.<span style="color:#66d9ef">id</span>
+</span></span><span style="display:flex;"><span>  route_table_id <span style="color:#f92672">=</span> <span style="color:#66d9ef">aws_route_table</span>.<span style="color:#960050;background-color:#1e0010">&lt;</span><span style="color:#66d9ef">rt1</span><span style="color:#960050;background-color:#1e0010">-</span><span style="color:#66d9ef">name</span><span style="color:#960050;background-color:#1e0010">-</span><span style="color:#66d9ef">here</span><span style="color:#960050;background-color:#1e0010">&gt;</span>.<span style="color:#66d9ef">id</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>As before, see if you can figure out how to repeat this for our second public subnet.</p>
+<!-- raw HTML omitted -->
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-hcl" data-lang="hcl"><span style="display:flex;"><span><span style="color:#66d9ef">resource</span> <span style="color:#e6db74">&#34;aws_route_table_association&#34; &#34;&lt;rta2-name-here&gt;&#34;</span> {
+</span></span><span style="display:flex;"><span>  subnet_id      <span style="color:#f92672">=</span> <span style="color:#66d9ef">aws_subnet</span>.<span style="color:#960050;background-color:#1e0010">&lt;</span><span style="color:#66d9ef">subnet2</span><span style="color:#960050;background-color:#1e0010">-</span><span style="color:#66d9ef">name</span><span style="color:#960050;background-color:#1e0010">-</span><span style="color:#66d9ef">here</span><span style="color:#960050;background-color:#1e0010">&gt;</span>.<span style="color:#66d9ef">id</span>
+</span></span><span style="display:flex;"><span>  route_table_id <span style="color:#f92672">=</span> <span style="color:#66d9ef">aws_route_table</span>.<span style="color:#960050;background-color:#1e0010">&lt;</span><span style="color:#66d9ef">rt1</span><span style="color:#960050;background-color:#1e0010">-</span><span style="color:#66d9ef">name</span><span style="color:#960050;background-color:#1e0010">-</span><span style="color:#66d9ef">here</span><span style="color:#960050;background-color:#1e0010">&gt;</span>.<span style="color:#66d9ef">id</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><!-- raw HTML omitted -->
+<h3 id="32---private-gateway">3.2 - Private Gateway</h3>
+<p>Similar to the public gateway but set up to only allow requests from the load balancer to reach the EC2 instances whilst allowing all traffic from them to pass out. This is done with a NAT gateway. The gateway sits between the public subnet with internet access (created in the previous step) and the private subnet.</p>
+<p>To access the internet, the gateway will need an elastic IP. Create <code>gateways-private.tf</code> and add the EIP block:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-hcl" data-lang="hcl"><span style="display:flex;"><span><span style="color:#66d9ef">resource</span> <span style="color:#e6db74">&#34;aws_eip&#34; &#34;&lt;eip-name-here&gt;&#34;</span> {
+</span></span><span style="display:flex;"><span>  depends_on <span style="color:#f92672">=</span> [<span style="color:#66d9ef">aws_internet_gateway</span>.<span style="color:#960050;background-color:#1e0010">&lt;</span><span style="color:#66d9ef">gw1</span><span style="color:#960050;background-color:#1e0010">-</span><span style="color:#66d9ef">name</span><span style="color:#960050;background-color:#1e0010">-</span><span style="color:#66d9ef">here</span><span style="color:#960050;background-color:#1e0010">&gt;</span>]
+</span></span><span style="display:flex;"><span>  vpc        <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>
+</span></span><span style="display:flex;"><span>  tags <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>    Name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&lt;eip-name-here&gt;&#34;</span>
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>Note the use of <code>depends_on</code> - this means the EIP won&rsquo;t be created until after the referenced gateway is created. Can&rsquo;t assign an IP address to nothing. We&rsquo;ll be seeing it again.</p>
+<p>The NAT gateway also <code>depends_on</code> the internet gateway existing:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-hcl" data-lang="hcl"><span style="display:flex;"><span><span style="color:#66d9ef">resource</span> <span style="color:#e6db74">&#34;aws_nat_gateway&#34; &#34;&lt;natgw-name-here&gt;&#34;</span> {
+</span></span><span style="display:flex;"><span>  allocation_id <span style="color:#f92672">=</span> <span style="color:#66d9ef">aws_eip</span>.<span style="color:#960050;background-color:#1e0010">&lt;</span><span style="color:#66d9ef">eip</span><span style="color:#960050;background-color:#1e0010">-</span><span style="color:#66d9ef">name</span><span style="color:#960050;background-color:#1e0010">-</span><span style="color:#66d9ef">here</span><span style="color:#960050;background-color:#1e0010">&gt;</span>.<span style="color:#66d9ef">id</span>
+</span></span><span style="display:flex;"><span>  subnet_id     <span style="color:#f92672">=</span> <span style="color:#66d9ef">aws_subnet</span>.<span style="color:#960050;background-color:#1e0010">&lt;</span><span style="color:#66d9ef">subnet1</span><span style="color:#960050;background-color:#1e0010">-</span><span style="color:#66d9ef">name</span><span style="color:#960050;background-color:#1e0010">-</span><span style="color:#66d9ef">here</span><span style="color:#960050;background-color:#1e0010">&gt;</span>.<span style="color:#66d9ef">id</span>
+</span></span><span style="display:flex;"><span>  tags <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>    Name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&lt;natgw-name-here&gt;&#34;</span>
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>  depends_on <span style="color:#f92672">=</span> [<span style="color:#66d9ef">aws_internet_gateway</span>.<span style="color:#960050;background-color:#1e0010">&lt;</span><span style="color:#66d9ef">gw1</span><span style="color:#960050;background-color:#1e0010">-</span><span style="color:#66d9ef">name</span><span style="color:#960050;background-color:#1e0010">-</span><span style="color:#66d9ef">here</span><span style="color:#960050;background-color:#1e0010">&gt;</span>]
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>We&rsquo;ll need a route table for the private subnet to connect out to the internet. This is done by providing a route to 0.0.0.0/0, which will match all destination IP addresses and act as a default route.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-hcl" data-lang="hcl"><span style="display:flex;"><span><span style="color:#66d9ef">resource</span> <span style="color:#e6db74">&#34;aws_route_table&#34; &#34;&lt;rt2-name-here&gt;&#34;</span> {
+</span></span><span style="display:flex;"><span>  vpc_id <span style="color:#f92672">=</span> <span style="color:#66d9ef">aws_vpc</span>.<span style="color:#960050;background-color:#1e0010">&lt;</span><span style="color:#66d9ef">vpc</span><span style="color:#960050;background-color:#1e0010">-</span><span style="color:#66d9ef">name</span><span style="color:#960050;background-color:#1e0010">-</span><span style="color:#66d9ef">here</span><span style="color:#960050;background-color:#1e0010">&gt;</span>.<span style="color:#66d9ef">id</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">route</span> {
+</span></span><span style="display:flex;"><span>    cidr_block     <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;0.0.0.0/0&#34;</span>
+</span></span><span style="display:flex;"><span>    nat_gateway_id <span style="color:#f92672">=</span> <span style="color:#66d9ef">aws_nat_gateway</span>.<span style="color:#960050;background-color:#1e0010">&lt;</span><span style="color:#66d9ef">natgw</span><span style="color:#960050;background-color:#1e0010">-</span><span style="color:#66d9ef">name</span><span style="color:#960050;background-color:#1e0010">-</span><span style="color:#66d9ef">here</span><span style="color:#960050;background-color:#1e0010">&gt;</span>.<span style="color:#66d9ef">id</span>
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>And finally, the route table will need associated with the private subnet. You know what to do here.</p>
+<!-- raw HTML omitted -->
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-hcl" data-lang="hcl"><span style="display:flex;"><span><span style="color:#66d9ef">resource</span> <span style="color:#e6db74">&#34;aws_route_table_association&#34; &#34;&lt;rta3-name-here&gt;&#34;</span> {
+</span></span><span style="display:flex;"><span>  subnet_id      <span style="color:#f92672">=</span> <span style="color:#66d9ef">aws_subnet</span>.<span style="color:#960050;background-color:#1e0010">&lt;</span><span style="color:#66d9ef">subnet3</span><span style="color:#960050;background-color:#1e0010">-</span><span style="color:#66d9ef">name</span><span style="color:#960050;background-color:#1e0010">-</span><span style="color:#66d9ef">here</span><span style="color:#960050;background-color:#1e0010">&gt;</span>.<span style="color:#66d9ef">id</span>
+</span></span><span style="display:flex;"><span>  route_table_id <span style="color:#f92672">=</span> <span style="color:#66d9ef">aws_route_table</span>.<span style="color:#960050;background-color:#1e0010">&lt;</span><span style="color:#66d9ef">rt2</span><span style="color:#960050;background-color:#1e0010">-</span><span style="color:#66d9ef">name</span><span style="color:#960050;background-color:#1e0010">-</span><span style="color:#66d9ef">here</span><span style="color:#960050;background-color:#1e0010">&gt;</span>.<span style="color:#66d9ef">id</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>As before, we create the route table association resource then specify that our NAT gateway route table is going into our private subnet.</p>
+<!-- raw HTML omitted -->
+<p><a href="#contents">^top</a></p>
+<hr>
+<h2 id="4-ELB">4 - Load Balancer</h2>
+<p>The load balancer (LB) will balance traffic between all targets in the target group. Because we&rsquo;re balancing traffic for specific port numbers we&rsquo;ll use an application laod balancer. Start by setting up <code>load-balancer.tf</code>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-hcl" data-lang="hcl"><span style="display:flex;"><span><span style="color:#66d9ef">resource</span> <span style="color:#e6db74">&#34;aws_lb&#34; &#34;&lt;lb-name-here&gt;&#34;</span> {
+</span></span><span style="display:flex;"><span>  name               <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&lt;lb-name-here&gt;&#34;</span>
+</span></span><span style="display:flex;"><span>  internal           <span style="color:#f92672">=</span> <span style="color:#66d9ef">false</span>
+</span></span><span style="display:flex;"><span>  load_balancer_type <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;application&#34;</span>
+</span></span><span style="display:flex;"><span>  security_groups    <span style="color:#f92672">=</span> [<span style="color:#66d9ef">aws_security_group</span>.<span style="color:#960050;background-color:#1e0010">&lt;</span><span style="color:#66d9ef">lbsg</span><span style="color:#960050;background-color:#1e0010">-</span><span style="color:#66d9ef">name</span><span style="color:#960050;background-color:#1e0010">-</span><span style="color:#66d9ef">here</span><span style="color:#960050;background-color:#1e0010">&gt;</span>.<span style="color:#66d9ef">id</span>]
+</span></span><span style="display:flex;"><span>  subnets            <span style="color:#f92672">=</span> [<span style="color:#66d9ef">aws_subnet</span>.<span style="color:#960050;background-color:#1e0010">&lt;</span><span style="color:#66d9ef">subnet1</span><span style="color:#960050;background-color:#1e0010">-</span><span style="color:#66d9ef">name</span><span style="color:#960050;background-color:#1e0010">-</span><span style="color:#66d9ef">here</span><span style="color:#960050;background-color:#1e0010">&gt;</span>.<span style="color:#66d9ef">id</span>, <span style="color:#66d9ef">aws_subnet</span>.<span style="color:#960050;background-color:#1e0010">&lt;</span><span style="color:#66d9ef">subnet2</span><span style="color:#960050;background-color:#1e0010">-</span><span style="color:#66d9ef">name</span><span style="color:#960050;background-color:#1e0010">-</span><span style="color:#66d9ef">here</span><span style="color:#960050;background-color:#1e0010">&gt;</span>.<span style="color:#66d9ef">id</span>]
+</span></span><span style="display:flex;"><span>  depends_on         <span style="color:#f92672">=</span> [<span style="color:#66d9ef">aws_internet_gateway</span>.<span style="color:#960050;background-color:#1e0010">&lt;</span><span style="color:#66d9ef">gw1</span><span style="color:#960050;background-color:#1e0010">-</span><span style="color:#66d9ef">name</span><span style="color:#960050;background-color:#1e0010">-</span><span style="color:#66d9ef">here</span><span style="color:#960050;background-color:#1e0010">&gt;</span>]
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>The security group that governs the LB has not been created yet (we&rsquo;ll handle security later). Note the subnets the LB is a member of and what it <code>depends_on</code> being created first.</p>
+<p>The target group is set up to operate on port 80. I&rsquo;ve left the protocol name out, let&rsquo;s see if you can figure out what four letter protocol runs on port 80.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-hcl" data-lang="hcl"><span style="display:flex;"><span><span style="color:#66d9ef">resource</span> <span style="color:#e6db74">&#34;aws_lb_target_group&#34; &#34;&lt;tg-name-here&gt;&#34;</span> {
+</span></span><span style="display:flex;"><span>  name     <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&lt;tg-name-here&gt;&#34;</span>
+</span></span><span style="display:flex;"><span>  port     <span style="color:#f92672">=</span> <span style="color:#ae81ff">80</span>
+</span></span><span style="display:flex;"><span>  protocol <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&lt;omitted-to-make-you-think&gt;&#34;</span>
+</span></span><span style="display:flex;"><span>  vpc_id   <span style="color:#f92672">=</span> <span style="color:#66d9ef">aws_vpc</span>.<span style="color:#960050;background-color:#1e0010">&lt;</span><span style="color:#66d9ef">vpc</span><span style="color:#960050;background-color:#1e0010">-</span><span style="color:#66d9ef">name</span><span style="color:#960050;background-color:#1e0010">-</span><span style="color:#66d9ef">here</span><span style="color:#960050;background-color:#1e0010">&gt;</span>.<span style="color:#66d9ef">id</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>And to listen for traffic coming in, the LB needs a listener. It&rsquo;d be easy if I gave you the protocol here after asking for it earlier but we don&rsquo;t do things because they are easy. The listener needs some actions to do, in this case we want it to forward traffic from port 80 to the target group we defined earlier.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-hcl" data-lang="hcl"><span style="display:flex;"><span><span style="color:#66d9ef">resource</span> <span style="color:#e6db74">&#34;aws_lb_listener&#34; &#34;&lt;lbl-name-here&gt;&#34;</span> {
+</span></span><span style="display:flex;"><span>  load_balancer_arn <span style="color:#f92672">=</span> <span style="color:#66d9ef">aws_lb</span>.<span style="color:#960050;background-color:#1e0010">&lt;</span><span style="color:#66d9ef">lb</span><span style="color:#960050;background-color:#1e0010">-</span><span style="color:#66d9ef">name</span><span style="color:#960050;background-color:#1e0010">-</span><span style="color:#66d9ef">here</span><span style="color:#960050;background-color:#1e0010">&gt;</span>.<span style="color:#66d9ef">arn</span>
+</span></span><span style="display:flex;"><span>  port              <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;80&#34;</span>
+</span></span><span style="display:flex;"><span>  protocol          <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&lt;omitted-to-make-you-think&gt;&#34;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">default_action</span> {
+</span></span><span style="display:flex;"><span>    type             <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;forward&#34;</span>
+</span></span><span style="display:flex;"><span>    target_group_arn <span style="color:#f92672">=</span> <span style="color:#66d9ef">aws_lb_target_group</span>.<span style="color:#960050;background-color:#1e0010">&lt;</span><span style="color:#66d9ef">tg</span><span style="color:#960050;background-color:#1e0010">-</span><span style="color:#66d9ef">name</span><span style="color:#960050;background-color:#1e0010">-</span><span style="color:#66d9ef">here</span><span style="color:#960050;background-color:#1e0010">&gt;</span>.<span style="color:#66d9ef">arn</span>
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><!-- raw HTML omitted -->
+<p>Port 80 is used by the HTTP protocol. You should know this already if you&rsquo;re going to start learning cloud engineering.</p>
+<!-- raw HTML omitted -->
+<p><a href="#contents">^top</a></p>
+<hr>
+<h2 id="5-ASG">5 - Auto Scaling</h2>
+<p>In this step we&rsquo;ll create an auto scaling group (ASG) to create the EC2 instances. To configure the EC2s we&rsquo;ll use a launch template.</p>
+<h3 id="51---asg--launch-template">5.1 - ASG &amp; Launch Template</h3>
+<p>Starting with the ASG we give it a <code>min_size</code> to specify the number of EC2s for periods of low demand, <code>max_size</code> to give the maximum number of EC2s to provision, and the <code>desired_capacity</code> specifies the ideal number of EC2s to aim for. Be careful, as <code>max_size</code> can and will bankrupt you if you set it above your budget. This guide assumes you&rsquo;re using the free tier so we&rsquo;ll keep it low.</p>
+<p>Create <code>asg-ec2.tf</code> and create the ASG:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-hcl" data-lang="hcl"><span style="display:flex;"><span><span style="color:#66d9ef">resource</span> <span style="color:#e6db74">&#34;aws_autoscaling_group&#34; &#34;&lt;asg-name-here&gt;&#34;</span> {
+</span></span><span style="display:flex;"><span>  max_size         <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>  min_size         <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>  desired_capacity <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>  target_group_arns <span style="color:#f92672">=</span> [<span style="color:#66d9ef">aws_lb_target_group</span>.<span style="color:#960050;background-color:#1e0010">&lt;</span><span style="color:#66d9ef">tg</span><span style="color:#960050;background-color:#1e0010">-</span><span style="color:#66d9ef">name</span><span style="color:#960050;background-color:#1e0010">-</span><span style="color:#66d9ef">here</span><span style="color:#960050;background-color:#1e0010">&gt;</span>.<span style="color:#66d9ef">arn</span>]
+</span></span><span style="display:flex;"><span>  vpc_zone_identifier <span style="color:#f92672">=</span> [
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">aws_subnet</span>.<span style="color:#960050;background-color:#1e0010">&lt;</span><span style="color:#66d9ef">subnet3</span><span style="color:#960050;background-color:#1e0010">-</span><span style="color:#66d9ef">name</span><span style="color:#960050;background-color:#1e0010">-</span><span style="color:#66d9ef">here</span><span style="color:#960050;background-color:#1e0010">&gt;</span>.<span style="color:#66d9ef">id</span>
+</span></span><span style="display:flex;"><span>  ]
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">launch_template</span> {
+</span></span><span style="display:flex;"><span>    id      <span style="color:#f92672">=</span> <span style="color:#66d9ef">aws_launch_template</span>.<span style="color:#960050;background-color:#1e0010">&lt;</span><span style="color:#66d9ef">ltp</span><span style="color:#960050;background-color:#1e0010">-</span><span style="color:#66d9ef">name</span><span style="color:#960050;background-color:#1e0010">-</span><span style="color:#66d9ef">here</span><span style="color:#960050;background-color:#1e0010">&gt;</span>.<span style="color:#66d9ef">id</span>
+</span></span><span style="display:flex;"><span>    version <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;$Latest&#34;</span>
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>Note the reference to the target group we created earlier, the subnet we&rsquo;re putting the ASG in (private or public?), and the launch template. Let&rsquo;s create that launch template now:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-hcl" data-lang="hcl"><span style="display:flex;"><span><span style="color:#66d9ef">resource</span> <span style="color:#e6db74">&#34;aws_launch_template&#34; &#34;&lt;ltp-name-here&gt;&#34;</span> {
+</span></span><span style="display:flex;"><span>  name_prefix   <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&lt;ltp-name-here&gt;&#34;</span>
+</span></span><span style="display:flex;"><span>  image_id      <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&lt;ami-id-here&gt;&#34;</span>
+</span></span><span style="display:flex;"><span>  instance_type <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;t2.micro&#34;</span>
+</span></span><span style="display:flex;"><span>  user_data     <span style="color:#f92672">=</span> <span style="color:#66d9ef">filebase64</span>(<span style="color:#e6db74">&#34;user_data.sh&#34;</span>)
+</span></span></code></pre></div><p>To keep it low cost/free we&rsquo;re using t2 micro EC2 instances. The <code>name_prefix</code> will be prepended to the instance name. For the <code>image_id</code> you need to use an Amazon Machine Image ID number from the region in which the EC2 instances will be deployed. For this project I&rsquo;d recommend finding the AMI for Amazon Linux 2 in your region. We&rsquo;ll come back to the <code>user_data</code> later, but for now just know that this will be loaded when the EC2 instance is created.</p>
+<p>The rest of the resource block contains the network interface information and a tag for organisation. The network interface has to be assigned to the subnet in which we&rsquo;re putting the EC2 instances (now is that a public or private subnet?) and the security group will be created later.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-hcl" data-lang="hcl"><span style="display:flex;"><span>  <span style="color:#66d9ef">network_interfaces</span> {
+</span></span><span style="display:flex;"><span>    associate_public_ip_address <span style="color:#f92672">=</span> <span style="color:#66d9ef">false</span>
+</span></span><span style="display:flex;"><span>    subnet_id                   <span style="color:#f92672">=</span> <span style="color:#66d9ef">aws_subnet</span>.<span style="color:#960050;background-color:#1e0010">&lt;</span><span style="color:#66d9ef">subnet3</span><span style="color:#960050;background-color:#1e0010">-</span><span style="color:#66d9ef">name</span><span style="color:#960050;background-color:#1e0010">-</span><span style="color:#66d9ef">here</span><span style="color:#960050;background-color:#1e0010">&gt;</span>.<span style="color:#66d9ef">id</span>
+</span></span><span style="display:flex;"><span>    security_groups             <span style="color:#f92672">=</span> [<span style="color:#66d9ef">aws_security_group</span>.<span style="color:#960050;background-color:#1e0010">&lt;</span><span style="color:#66d9ef">ec2sg</span><span style="color:#960050;background-color:#1e0010">-</span><span style="color:#66d9ef">name</span><span style="color:#960050;background-color:#1e0010">-</span><span style="color:#66d9ef">here</span><span style="color:#960050;background-color:#1e0010">&gt;</span>.<span style="color:#66d9ef">id</span>]
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">tag_specifications</span> {
+</span></span><span style="display:flex;"><span>    resource_type <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;instance&#34;</span>
+</span></span><span style="display:flex;"><span>    tags <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>      Name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&lt;instance-name&gt;&#34;</span>
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="52---user-data">5.2 - User Data</h3>
+<p>The <code>user_data</code> referenced should be in the same directory as the <code>.tf</code> files. It&rsquo;s a bash script that will run on the EC2 instances when they&rsquo;re created. With this project we&rsquo;re just running a web server for demonstration purposes, so in production this user data will likely be more interesting.</p>
+<p>Create <code>user_data.sh</code> and fill it with the following:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e">#!/bin/bash
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>sudo yum update -y
+</span></span><span style="display:flex;"><span>sudo yum install -y httpd
+</span></span><span style="display:flex;"><span>sudo systemctl start httpd
+</span></span><span style="display:flex;"><span>sudo systemctl enable httpd
+</span></span><span style="display:flex;"><span>echo <span style="color:#e6db74">&#34;&lt;h1&gt;Ahoy there skipper, welcome to </span><span style="color:#66d9ef">$(</span>hostname -f<span style="color:#66d9ef">)</span><span style="color:#e6db74">&lt;h1&gt;&#34;</span> &gt; /var/www/html/index.html
+</span></span></code></pre></div><p>If you&rsquo;re planning on becoming a cloud engineer then you should be able to recognise what this script does before starting this guide. But if you&rsquo;re really stuck&hellip;</p>
+<!-- raw HTML omitted -->
+<p>The first two lines update the system packages and install a web server.</p>
+<ul>
+<li><code>yum</code> is the package manager used in Amazon Linux 2</li>
+<li><code>yum update</code> upgrades the installed packages to the latest versions</li>
+<li><code>yum install</code> installs a new software package</li>
+<li><code>httpd</code> is how RHEL based distros refer to the Apache web server</li>
+<li><code>-y</code> is a flag that automatically sends &ldquo;yes&rdquo; to yes/no prompts</li>
+</ul>
+<p>The next two lines get the web server running.</p>
+<ul>
+<li><code>systemctl</code> is used to control services</li>
+<li><code>systemctl start</code> starts a service</li>
+<li><code>systemctl enable</code> sets a service to start upon boot</li>
+</ul>
+<p>And finally the last line sends some HTML code to the default site location for the web server software.</p>
+<ul>
+<li><code>echo</code> prints a string to the standard output</li>
+<li><code>$(hostname -f)</code> inserts the fqdn to the string</li>
+<li><code>&gt;</code> redirects where the string goes (from stdout to the index.html)</li>
+</ul>
+<p>So all in all this bash script will update the EC2 instance&rsquo;s OS, install Apache, start Apache and set it to start on boot, then create a simple HTML document containing the fully qualified domain name of the EC2 instance.</p>
+<!-- raw HTML omitted -->
+<p><a href="#contents">^top</a></p>
+<hr>
+<h2 id="6-SGs">6 - Security Groups</h2>
+<p>Finally, we need to allow traffic to pass through our load balancer. This is done by applying security groups to the various services.</p>
+<h3 id="61---security-group-for-elb">6.1 - Security Group for ELB</h3>
+<p>Let&rsquo;s start by creating <code>security-groups.tf</code> and adding the SG for the load balancer:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-hcl" data-lang="hcl"><span style="display:flex;"><span><span style="color:#66d9ef">resource</span> <span style="color:#e6db74">&#34;aws_security_group&#34; &#34;&lt;lbsg-name-here&gt;&#34;</span> {
+</span></span><span style="display:flex;"><span>  name   <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&lt;lbsg-name-here&gt;&#34;</span>
+</span></span><span style="display:flex;"><span>  vpc_id <span style="color:#f92672">=</span> <span style="color:#66d9ef">aws_vpc</span>.<span style="color:#960050;background-color:#1e0010">&lt;</span><span style="color:#66d9ef">vpc</span><span style="color:#960050;background-color:#1e0010">-</span><span style="color:#66d9ef">name</span><span style="color:#960050;background-color:#1e0010">-</span><span style="color:#66d9ef">here</span><span style="color:#960050;background-color:#1e0010">&gt;</span>.<span style="color:#66d9ef">id</span>
+</span></span></code></pre></div><p>Next we specify the ingress rules for permitting HTTP and HTTPS traffic. Note that the IP address range matches for CIDR block 0.0.0.0/0.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-hcl" data-lang="hcl"><span style="display:flex;"><span>  <span style="color:#66d9ef">ingress</span> {
+</span></span><span style="display:flex;"><span>    description      <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Allow HTTP requests from all sources&#34;</span>
+</span></span><span style="display:flex;"><span>    protocol         <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;tcp&#34;</span>
+</span></span><span style="display:flex;"><span>    from_port        <span style="color:#f92672">=</span> <span style="color:#ae81ff">80</span>
+</span></span><span style="display:flex;"><span>    to_port          <span style="color:#f92672">=</span> <span style="color:#ae81ff">80</span>
+</span></span><span style="display:flex;"><span>    cidr_blocks      <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#34;0.0.0.0/0&#34;</span>]
+</span></span><span style="display:flex;"><span>    ipv6_cidr_blocks <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#34;::/0&#34;</span>]
+</span></span><span style="display:flex;"><span>  }
+</span></span></code></pre></div><p>As before, I&rsquo;ve omitted the port number to get the noggin&rsquo; joggin&rsquo;. We specify the rule for a range of port numbers, but in this case we only want to target HTTPS traffic so the <code>from_port</code> and <code>to_port</code> will be the same value.</p>
+<pre tabindex="0"><code>  ingress {
+    description      = &#34;Allow HTTPS requests from all sources&#34;
+    protocol         = &#34;tcp&#34;
+    from_port        = &lt;port-number-here&gt;
+    to_port          = &lt;port-number-here&gt;
+    cidr_blocks      = [&#34;0.0.0.0/0&#34;]
+    ipv6_cidr_blocks = [&#34;::/0&#34;]
+  }
+</code></pre><!-- raw HTML omitted -->
+<p>Port 443 is used for HTTPS.</p>
+<!-- raw HTML omitted -->
+<p>And to close the block off add the egress rule. As we wish to permit all traffic out, the rule&rsquo;s port range is 0 to 0. and the protocol is set to <code>-1</code> - this is semantically equivalent to <em>all</em> protocols.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-hcl" data-lang="hcl"><span style="display:flex;"><span>  <span style="color:#66d9ef">egress</span> {
+</span></span><span style="display:flex;"><span>    from_port   <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>    to_port     <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>    protocol    <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;-1&#34;</span>
+</span></span><span style="display:flex;"><span>    cidr_blocks <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#34;0.0.0.0/0&#34;</span>]
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="62---security-group-for-ec2">6.2 - Security Group for EC2</h3>
+<p>In the same file (or in a separate file, I&rsquo;ve grouped them together for convenience) add another security group resource block for the EC2 instances.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-hcl" data-lang="hcl"><span style="display:flex;"><span><span style="color:#66d9ef">resource</span> <span style="color:#e6db74">&#34;aws_security_group&#34; &#34;&lt;ec2sg-name-here&gt;&#34;</span> {
+</span></span><span style="display:flex;"><span>  name   <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&lt;ec2sg-name-here&gt;&#34;</span>
+</span></span><span style="display:flex;"><span>  vpc_id <span style="color:#f92672">=</span> <span style="color:#66d9ef">aws_vpc</span>.<span style="color:#960050;background-color:#1e0010">&lt;</span><span style="color:#66d9ef">vpc</span><span style="color:#960050;background-color:#1e0010">-</span><span style="color:#66d9ef">name</span><span style="color:#960050;background-color:#1e0010">-</span><span style="color:#66d9ef">here</span><span style="color:#960050;background-color:#1e0010">&gt;</span>.<span style="color:#66d9ef">id</span>
+</span></span></code></pre></div><p>As you&rsquo;ll have noticed this block starts the same as the previous block for the ELB. The ingress and egress rules are going to be almost entirely the same, but with the ingress rule having a list of security groups provided as a source of traffic. This list consists of one entry: the ELB security group we made in the previous section.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-hcl" data-lang="hcl"><span style="display:flex;"><span>  <span style="color:#66d9ef">ingress</span> {
+</span></span><span style="display:flex;"><span>    description     <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Allow HTTP requests from the Load Balancer&#34;</span>
+</span></span><span style="display:flex;"><span>    protocol        <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;tcp&#34;</span>
+</span></span><span style="display:flex;"><span>    from_port       <span style="color:#f92672">=</span> <span style="color:#ae81ff">80</span>
+</span></span><span style="display:flex;"><span>    to_port         <span style="color:#f92672">=</span> <span style="color:#ae81ff">80</span>
+</span></span><span style="display:flex;"><span>    security_groups <span style="color:#f92672">=</span> [<span style="color:#66d9ef">aws_security_group</span>.<span style="color:#960050;background-color:#1e0010">&lt;</span><span style="color:#66d9ef">lbsg</span><span style="color:#960050;background-color:#1e0010">-</span><span style="color:#66d9ef">name</span><span style="color:#960050;background-color:#1e0010">-</span><span style="color:#66d9ef">here</span><span style="color:#960050;background-color:#1e0010">&gt;</span>.<span style="color:#66d9ef">id</span>]
+</span></span><span style="display:flex;"><span>  }
+</span></span></code></pre></div><p>And finally, to allow traffic out we add an egress block as before. Specify all protocols and match all IP addresses. You know what to do. And if not&hellip;</p>
+<!-- raw HTML omitted -->
+<pre tabindex="0"><code>  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = &#34;-1&#34;
+    cidr_blocks = [&#34;0.0.0.0/0&#34;]
+  }
+}
+</code></pre><p>As <code>protocol</code> is set to <code>-1</code>, the <code>from_port</code> and <code>to_port</code> must be set to 0.</p>
+<!-- raw HTML omitted -->
+<p><a href="#contents">^top</a></p>
+<hr>
+<h2 id="7-troubleshooting">7 - Deploying &amp; Troubleshooting</h2>
+<h3 id="71---terraform">7.1 - Terraform</h3>
+<p>And now our project is ready to roll. Run <code>terraform init</code> to install the required providers if you haven&rsquo;t already, then run <code>terraform plan</code> to check the changes to be made. If everything has been configured correctly there should be no error messages. From here we have a few options.</p>
+<ul>
+<li><code>terraform fmt</code> will format the files to the Terraform standards (whilst the code <em>will</em> run if only syntactically correct, we do not work in isolation and others must be able to read our code - for this reason we should adhere to the Terraform formatting)</li>
+<li><code>terraform validate</code> will check the syntax of the configuration files in the project</li>
+<li><code>terraform apply</code> means it&rsquo;s Go Time: Terraform will convert the configuration files to API requests and build our infrastructures on the AWS cloud</li>
+</ul>
+<h3 id="72---testing">7.2 - Testing</h3>
+<p>First, let&rsquo;s recap by taking an overview of what this project does.
+From server to client:</p>
+<ul>
+<li>our EC2 instance(s) is(/are) deploying with Apache and a simple web page that has the fully qualified domain name of the instance upon which it is running</li>
+<li>to reach the web page, user&rsquo;s requests go through the load balancer</li>
+<li>the load balancer selects an EC2 instance from the target group to which the traffic shall be passed</li>
+<li>the user traffic reaches the load balancer from its DNS name, which can be found via the AWS console or CLI (<code>aws elb describe-load-balancers --load-balancer-name &lt;elb-name-here&gt;</code>)</li>
+<li>depending on workload, the ASG will create more or fewer EC2 instances to populate the target group the through which the load balancer will share traffic</li>
+</ul>
+<p>In effect, this means we can see which EC2 instance we&rsquo;ve reached when we reload the page.</p>
+<h3 id="73---troubleshooting">7.3 - Troubleshooting</h3>
+<p>There&rsquo;s rarely a one-size-fits-all way to write troubleshooting for projects, so here are some general tips that helped me.</p>
+<ul>
+<li>Each piece of this project has a place it fits and other pieces it interacts with. Make sure your pieces are in the right place and are connected to the right parts.</li>
+<li>Understanding what each part does is a massive help. Even if it&rsquo;s just a vague overview it makes it so that you&rsquo;re not blindly trying to figure out what&rsquo;s going wrong with something totally alien.</li>
+<li>Check your syntax, check your formatting, check spelling mistakes and typos, check IP addresses and other numerical values are correct.</li>
+<li>Don&rsquo;t think of error messages as locks for which you need to find a key. Error messages are puzzles with hints on how to solve them. Try to understand what error messages mean, combine this with understanding what each piece connects to and how it works to make troubleshooting a breeze.</li>
+<li>Take things slowly and think through the code as though one step at a time. What is each part doing and why?</li>
+<li>When in doubt, Google search your query in simple terms. If you don&rsquo;t understand that, ask others for help via forums or online chat groups. Learn how to ask a Really Good Question.</li>
+</ul>
+<p><a href="#contents">^top</a></p>
+
+    </div>
+</div>
+
+            </main>
+        </div>
+
+
+        <footer class="footer">
+    
+        <span>when in doubt search the web</span>
+    
+</footer>
+    </div>
+
+</body>
+
+</html>

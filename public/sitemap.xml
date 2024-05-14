@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+  xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>http://blackett.lol/</loc>
+    <lastmod>2024-05-14T11:22:26+00:00</lastmod>
+  </url><url>
+    <loc>http://blackett.lol/posts/</loc>
+    <lastmod>2024-05-14T11:22:26+00:00</lastmod>
+  </url><url>
+    <loc>http://blackett.lol/posts/that_thing/</loc>
+    <lastmod>2024-02-12T21:17:12+00:00</lastmod>
+  </url><url>
+    <loc>http://blackett.lol/posts/bruteforcing/</loc>
+    <lastmod>2024-02-12T19:45:00+00:00</lastmod>
+  </url><url>
+    <loc>http://blackett.lol/about/</loc>
+    <lastmod>2024-02-06T21:47:01+00:00</lastmod>
+  </url><url>
+    <loc>http://blackett.lol/aws/</loc>
+    <lastmod>2024-02-06T20:16:08+00:00</lastmod>
+  </url><url>
+    <loc>http://blackett.lol/aws/terraform-aws-load-balancer/</loc>
+    <lastmod>2024-02-06T20:16:08+00:00</lastmod>
+  </url><url>
+    <loc>http://blackett.lol/categories/</loc>
+  </url><url>
+    <loc>http://blackett.lol/tags/</loc>
+  </url>
+</urlset>

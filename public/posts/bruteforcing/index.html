@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en-gb">
+
+<head>
+    <title>
+Brute Forcing | blackett
+</title>
+
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name = "description" content = "">
+
+<meta name="generator" content="Hugo 0.125.7">
+
+
+<link rel="canonical" href="http://blackett.lol/posts/bruteforcing/" >
+<link href="/sass/main.min.55ebc964d1f2345e818fc19bcfbf8da6663bb551c6d04310c658e3b0c90a85cc.css" rel="stylesheet">
+
+
+
+
+</head>
+
+<body>
+
+    <div class="flexWrapper">
+        <header class="headerWrapper">
+    <div class="header">
+        <div>
+            <a href="http://blackett.lol/">
+                <span class="terminal">cap@blackett.lol ~ $</span>
+            </a>
+        </div>
+        <input class="side-menu" type="checkbox" id="side-menu">
+        <label class="hamb" for="side-menu"><span class="hamb-line"></span></label>
+        <nav class="headerLinks">
+            <ul>
+                
+                <li>
+                    <a href="http://blackett.lol/about" title="" >
+                        ~/about</a>
+                </li>
+                
+                <li>
+                    <a href="http://blackett.lol/aws" title="" >
+                        ~/aws</a>
+                </li>
+                
+                <li>
+                    <a href="http://blackett.lol/posts" title="" >
+                        ~/posts</a>
+                </li>
+                
+            </ul>
+        </nav>
+    </div>
+</header>
+
+
+        <div class="content">
+            <main class="main">
+                
+<div class="postWrapper">
+    <h1>Brute Forcing</h1>
+    
+    
+    <section class="postMetadata">
+        <dl>
+            
+            
+            
+            
+                <dt>posted</dt>
+                
+                <dd><time datetime="2024-02-12">February 12, 2024</time></dd>
+            
+            
+                <dt>read time</dt>
+                <dd>5 minutes</dd>
+            
+        </dl>
+    </section>
+    
+    <div>
+        <h3 id="ahhh-brute-forcing-my-old-friend">Ahhh&hellip; brute forcing, my old friend&hellip;</h3>
+<p>Brute forcing. What fun, eh? Can&rsquo;t pick a lock? Knock the door down! If you&rsquo;re reading this article then you&rsquo;ve been linked it because someone thinks you should learn why brute forcing is not the hotness you&rsquo;ve been lead to believe it is.</p>
+<p>So what is brute forcing anyway? In short, it&rsquo;s trying to guess every possible combination of characters and hoping it matches. Let&rsquo;s play a game. I&rsquo;m thinking of a number beteen 0 and 99. You can have as many guesses as you like. It would make sense to guess 0, then 1, then 2, then 3 etc. Eventually you&rsquo;d get my number. Congratulations, you&rsquo;ve brute forced the answer!</p>
+<h3 id="brute-forcing-passwords">Brute Forcing Passwords</h3>
+<p>Burte forcing is, to my knowledge, only talked about in the context of &lsquo;cracking passwords&rsquo;. You have the <a href="https://www.practicalnetworking.net/series/cryptography/hashing-algorithm/">hash of a password</a> and you want to figure out what the password is. You can&rsquo;t &ldquo;undo&rdquo; a hash so what do you do? Let&rsquo;s say the password is a four digit number. If you know what hashing algorithm was used to generate it you can now generate a hash for every combination of four digits and see if it&rsquo;s a match. Four digits is 0000 - 9999, so only 10,000 possible combinations. That shouldn&rsquo;t take too long, right?</p>
+<p>&hellip;right?</p>
+<h3 id="entropy">Entropy</h3>
+<p>Well I&rsquo;ve got some bad news for you. With the four digit number we&rsquo;re only dealing with the numbers 0 to 9. Add in a few more characters, like the letters A through Z in both upper and lower case, and the number of possible combinations explodes. The full alphanumeric space is 62 characters and at four characters long for the &lsquo;password&rsquo; we&rsquo;re trying to crack that&rsquo;d be 14,776,336 possible combinations. Fourteen <em>million!</em> And that&rsquo;s just four characters long. Maybe you have a nice GPU that can go brrrrr and churn through a million guesses per second. At most it&rsquo;d take 14 seconds, ezpz gg no re! Except&hellip; most passwords are longer than four characters&hellip; and don&rsquo;t only use A-Za-z0-9&hellip; uh oh!</p>
+<p>I&rsquo;ll do the maths for you. A 16 character long password using the full 95 character space (A-Za-Z0-9 plus symbols) is going to be huge. How huge? Do you really want to know? Okay then lol.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-py" data-lang="py"><span style="display:flex;"><span><span style="color:#ae81ff">95</span><span style="color:#f92672">*</span><span style="color:#ae81ff">95</span><span style="color:#f92672">*</span><span style="color:#ae81ff">95</span><span style="color:#f92672">*</span><span style="color:#ae81ff">95</span><span style="color:#f92672">*</span><span style="color:#ae81ff">95</span><span style="color:#f92672">*</span><span style="color:#ae81ff">95</span><span style="color:#f92672">*</span><span style="color:#ae81ff">95</span><span style="color:#f92672">*</span><span style="color:#ae81ff">95</span><span style="color:#f92672">*</span><span style="color:#ae81ff">95</span><span style="color:#f92672">*</span><span style="color:#ae81ff">95</span><span style="color:#f92672">*</span><span style="color:#ae81ff">95</span><span style="color:#f92672">*</span><span style="color:#ae81ff">95</span><span style="color:#f92672">*</span><span style="color:#ae81ff">95</span><span style="color:#f92672">*</span><span style="color:#ae81ff">95</span><span style="color:#f92672">*</span><span style="color:#ae81ff">95</span><span style="color:#f92672">*</span><span style="color:#ae81ff">95</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">4</span>,<span style="color:#ae81ff">401</span>,<span style="color:#ae81ff">266</span>,<span style="color:#ae81ff">700</span>,<span style="color:#ae81ff">000</span>,<span style="color:#ae81ff">000</span>,<span style="color:#ae81ff">000</span>,<span style="color:#ae81ff">000</span>,<span style="color:#ae81ff">000</span>,<span style="color:#ae81ff">000</span>,<span style="color:#ae81ff">000</span>
+</span></span></code></pre></div><p>Reckong your GPU can handle that?</p>
+<h3 id="exhausting-the-list">Exhausting The List</h3>
+<p>So you saved up all your pocket money, you stashed away your allowance, you took on an extra paper route, you stated washing some dishes, and you bought a super duper mega computer. Even at a billion guesses per second this 16 character long password is going to take 4,401,266,700,000,000,000,000 seconds to guess. That&rsquo;s only 139,563,251,522,070 years. Hehe.</p>
+<p>So you hacked NASA via <code>inspect element</code> and now you have access to their biggest and best computer and that time is not only 139 hours. But still no matches! What gives? I tricked you. The password we&rsquo;re trying to crack is not 16 characters long! Here&rsquo;s the kicker - you&rsquo;d have to wait for the full list of character combinations to be exhausted before you can know that it&rsquo;s longer than 16 characters. But you don&rsquo;t know if it&rsquo;s 17, or 18, or 32 characters long. Oh fiddlesticks. This whole thing is kind of silly now, isn&rsquo;t it?</p>
+<h3 id="when-it-works">When It Works</h3>
+<p>So why bother with brute forcing at all? It never works! Well, it sometimes works. Random combinations of characters, digits, and special symbols are hard to remember so humans often use passwords that are more legibile. Something like <code>password123</code> is easier to remember than <code>(i dJ&quot;14N%&quot;</code>. And sadly human beings are quite predictable. This is where wordlists come into place.</p>
+<p>Wordlists are lists of commonly used passwords (such as password123). When cyber security professionals use a brute forcing tool it will try the words in the wordlists first before trying random combinations. This adds more calculations for the comptuer to do (they don&rsquo;t want to retry character combinations they&rsquo;ve already guessed from the wordlists) but is sometimes worthwhile. This is still a last resort, though. It&rsquo;s not like a wordlist can contain every single possible password ever otherwise we run into the 149 gabillion jazillion years problem again. Any tools that try to generate passwords for the wordlist will still hit this problem eventually.</p>
+<h3 id="when-it-doesnt-work">When It Doesn&rsquo;t Work</h3>
+<p>There are many password managers around today that can help with generating secure passwords. I use <a href="https://bitwarden.com/">Bitwarden</a>. They have a free tier, a web browser plugin, it can be hosted locally, or you can use their cloud. Whilst brute forcing is a ridiculous attack it takes very little to mitigate against it. Take these passwords: <code>Password!1234567</code> and <code>^8o*&amp;D#74zcA7Pgi</code>. They both use the same mix of character spaces but one will be cracked almost immediately as it will show up in wordlists. You don&rsquo;t need to remember <code>^8o*&amp;D#74zcA7Pgi</code> because you&rsquo;ve got a password manager to do that for you. Hurrah!</p>
+<h3 id="conclusion">Conclusion</h3>
+<p>Password managers can get hacked so read up on the one you choose before using them. Or consider hosting locally. <a href="https://keepass.info/">KeePass</a> will <em>keep</em> your <em>ass</em> safe and is 100% locally hosted. What else can I say to pad this out&hellip; oh aye, how will you even get password hashes lol. If you&rsquo;re reading this you&rsquo;re probably a kid just starting out. I&rsquo;m not gonna show you that; I ain&rsquo;t <a href="https://www.youtube.com/@NetworkChuck">NetworkChuck</a>. Love you Chucky xxox</p>
+
+    </div>
+</div>
+
+            </main>
+        </div>
+
+
+        <footer class="footer">
+    
+        <span>when in doubt search the web</span>
+    
+</footer>
+    </div>
+
+</body>
+
+</html>

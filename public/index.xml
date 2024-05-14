@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title></title>
+    <link>http://blackett.lol/</link>
+    <description>Recent content on </description>
+    <generator>Hugo</generator>
+    <language>en-gb</language>
+    <managingEditor>cap@blackett.lol (blackett)</managingEditor>
+    <webMaster>cap@blackett.lol (blackett)</webMaster>
+    <lastBuildDate>Mon, 12 Feb 2024 21:17:12 +0000</lastBuildDate>
+    <atom:link href="http://blackett.lol/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>That Thing</title>
+      <link>http://blackett.lol/posts/that_thing/</link>
+      <pubDate>Mon, 12 Feb 2024 21:17:12 +0000</pubDate><author>cap@blackett.lol (blackett)</author>
+      <guid>http://blackett.lol/posts/that_thing/</guid>
+      <description>Contents That Thing You Were Thinking About Doing Second Opinion Asking Someone Else Google Searching It But What If I&amp;hellip;? Person XYZ You Don&amp;rsquo;t Want Me To Have Fun What To Do Instead Contact That Thing You Were Thinking About Doing Don&amp;rsquo;t.&#xA;Second Opinion Yeah, don&amp;rsquo;t.&#xA;Asking Someone Else They&amp;rsquo;ll say the same.&#xA;Google Searching It Be my guest.&#xA;But What If I&amp;hellip;? Doesn&amp;rsquo;t change my answer. Don&amp;rsquo;t.&#xA;But It&amp;rsquo;s Really Important!</description>
+    </item>
+    <item>
+      <title>Brute Forcing</title>
+      <link>http://blackett.lol/posts/bruteforcing/</link>
+      <pubDate>Mon, 12 Feb 2024 19:45:00 +0000</pubDate><author>cap@blackett.lol (blackett)</author>
+      <guid>http://blackett.lol/posts/bruteforcing/</guid>
+      <description>Ahhh&amp;hellip; brute forcing, my old friend&amp;hellip; Brute forcing. What fun, eh? Can&amp;rsquo;t pick a lock? Knock the door down! If you&amp;rsquo;re reading this article then you&amp;rsquo;ve been linked it because someone thinks you should learn why brute forcing is not the hotness you&amp;rsquo;ve been lead to believe it is.&#xA;So what is brute forcing anyway? In short, it&amp;rsquo;s trying to guess every possible combination of characters and hoping it matches. Let&amp;rsquo;s play a game.</description>
+    </item>
+    <item>
+      <title>Terraforming a Load Balancer in AWS</title>
+      <link>http://blackett.lol/aws/terraform-aws-load-balancer/</link>
+      <pubDate>Tue, 06 Feb 2024 20:16:08 +0000</pubDate><author>cap@blackett.lol (blackett)</author>
+      <guid>http://blackett.lol/aws/terraform-aws-load-balancer/</guid>
+      <description>About This guide assumes you have already installed and configured the AWS CLI and have Terraform installed on your computer. Throughout the guide are code snippets from the files in this project. To keep you on your toes they require you to input your resource names etc. No brainless copy/paste allowed.&#xA;This proejct was adapted from a blog post by Sharmila S. I went through the project myself and wrote this guide to solidify my understanding of how infrastructure on AWS can be deployed via Terraform.</description>
+    </item>
+  </channel>
+</rss>
