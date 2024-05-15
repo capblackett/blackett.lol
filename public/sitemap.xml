@@ -2,29 +2,29 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>http://blackett.lol/</loc>
+    <loc>http://0.0.0.0:1313/</loc>
     <lastmod>2024-05-14T11:22:26+00:00</lastmod>
   </url><url>
-    <loc>http://blackett.lol/posts/</loc>
+    <loc>http://0.0.0.0:1313/posts/</loc>
     <lastmod>2024-05-14T11:22:26+00:00</lastmod>
   </url><url>
-    <loc>http://blackett.lol/posts/that_thing/</loc>
+    <loc>http://0.0.0.0:1313/posts/that_thing/</loc>
     <lastmod>2024-02-12T21:17:12+00:00</lastmod>
   </url><url>
-    <loc>http://blackett.lol/posts/bruteforcing/</loc>
+    <loc>http://0.0.0.0:1313/posts/bruteforcing/</loc>
     <lastmod>2024-02-12T19:45:00+00:00</lastmod>
   </url><url>
-    <loc>http://blackett.lol/about/</loc>
+    <loc>http://0.0.0.0:1313/about/</loc>
     <lastmod>2024-02-06T21:47:01+00:00</lastmod>
   </url><url>
-    <loc>http://blackett.lol/aws/</loc>
+    <loc>http://0.0.0.0:1313/aws/</loc>
     <lastmod>2024-02-06T20:16:08+00:00</lastmod>
   </url><url>
-    <loc>http://blackett.lol/aws/terraform-aws-load-balancer/</loc>
+    <loc>http://0.0.0.0:1313/aws/terraform-aws-load-balancer/</loc>
     <lastmod>2024-02-06T20:16:08+00:00</lastmod>
   </url><url>
-    <loc>http://blackett.lol/categories/</loc>
+    <loc>http://0.0.0.0:1313/categories/</loc>
   </url><url>
-    <loc>http://blackett.lol/tags/</loc>
+    <loc>http://0.0.0.0:1313/tags/</loc>
   </url>
 </urlset>

@@ -2,13 +2,13 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>About on </title>
-    <link>http://blackett.lol/about/</link>
+    <link>http://0.0.0.0:1313/about/</link>
     <description>Recent content in About on </description>
     <generator>Hugo</generator>
     <language>en-gb</language>
     <managingEditor>cap@blackett.lol (blackett)</managingEditor>
     <webMaster>cap@blackett.lol (blackett)</webMaster>
     <lastBuildDate></lastBuildDate>
-    <atom:link href="http://blackett.lol/about/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="http://0.0.0.0:1313/about/index.xml" rel="self" type="application/rss+xml" />
   </channel>
 </rss>
