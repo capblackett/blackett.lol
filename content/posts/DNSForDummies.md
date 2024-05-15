@@ -1,7 +1,7 @@
 +++
 title = 'DNS For Dummies'
 date = 2024-05-14T11:22:26Z
-draft = false
+draft = true
 +++
 
 ## About {#About}

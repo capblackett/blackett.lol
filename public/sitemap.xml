@@ -8,11 +8,20 @@
     <loc>http://0.0.0.0:1313/posts/</loc>
     <lastmod>2024-05-14T11:22:26+00:00</lastmod>
   </url><url>
+    <loc>http://0.0.0.0:1313/posts/dnsfordummies/</loc>
+    <lastmod>2024-05-14T11:22:26+00:00</lastmod>
+  </url><url>
     <loc>http://0.0.0.0:1313/posts/that_thing/</loc>
     <lastmod>2024-02-12T21:17:12+00:00</lastmod>
   </url><url>
     <loc>http://0.0.0.0:1313/posts/bruteforcing/</loc>
     <lastmod>2024-02-12T19:45:00+00:00</lastmod>
+  </url><url>
+    <loc>http://0.0.0.0:1313/posts/starting_out/</loc>
+    <lastmod>2024-02-08T11:57:31+00:00</lastmod>
+  </url><url>
+    <loc>http://0.0.0.0:1313/posts/good_questions/</loc>
+    <lastmod>2024-02-07T23:18:07+00:00</lastmod>
   </url><url>
     <loc>http://0.0.0.0:1313/about/</loc>
     <lastmod>2024-02-06T21:47:01+00:00</lastmod>
@@ -22,6 +31,9 @@
   </url><url>
     <loc>http://0.0.0.0:1313/aws/terraform-aws-load-balancer/</loc>
     <lastmod>2024-02-06T20:16:08+00:00</lastmod>
+  </url><url>
+    <loc>http://0.0.0.0:1313/posts/test-post/</loc>
+    <lastmod>2024-02-06T18:56:50+00:00</lastmod>
   </url><url>
     <loc>http://0.0.0.0:1313/categories/</loc>
   </url><url>

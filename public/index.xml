@@ -8,8 +8,15 @@
     <language>en-gb</language>
     <managingEditor>cap@blackett.lol (blackett)</managingEditor>
     <webMaster>cap@blackett.lol (blackett)</webMaster>
-    <lastBuildDate>Mon, 12 Feb 2024 21:17:12 +0000</lastBuildDate>
+    <lastBuildDate>Tue, 14 May 2024 11:22:26 +0000</lastBuildDate>
     <atom:link href="http://0.0.0.0:1313/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>DNS For Dummies</title>
+      <link>http://0.0.0.0:1313/posts/dnsfordummies/</link>
+      <pubDate>Tue, 14 May 2024 11:22:26 +0000</pubDate><author>cap@blackett.lol (blackett)</author>
+      <guid>http://0.0.0.0:1313/posts/dnsfordummies/</guid>
+      <description>About A (somewhat) brief overview of the domain name system. It&amp;rsquo;s worth knowing on a deeper level just how we can get to www.example.com without knowing the IP address of the web server delivering the page.&#xA;Contents 1 - The Domain Name System 2 - Querying A DNS Server 3 - Types of DNS Server 4 - DNS Record Propagation 5 - Querying A DNS Server (Again) 6 - Types Of DNS Record 7 - Closing Thoughts 8 - Advanced Reading DNS Overview The Domain Name System As you may already know, computers communicate over networks using IP addresses to identify the specific device they are sending traffic to.</description>
+    </item>
     <item>
       <title>That Thing</title>
       <link>http://0.0.0.0:1313/posts/that_thing/</link>
@@ -25,11 +32,32 @@
       <description>Ahhh&amp;hellip; brute forcing, my old friend&amp;hellip; Brute forcing. What fun, eh? Can&amp;rsquo;t pick a lock? Knock the door down! If you&amp;rsquo;re reading this article then you&amp;rsquo;ve been linked it because someone thinks you should learn why brute forcing is not the hotness you&amp;rsquo;ve been lead to believe it is.&#xA;So what is brute forcing anyway? In short, it&amp;rsquo;s trying to guess every possible combination of characters and hoping it matches. Let&amp;rsquo;s play a game.</description>
     </item>
     <item>
+      <title>Starting Out</title>
+      <link>http://0.0.0.0:1313/posts/starting_out/</link>
+      <pubDate>Thu, 08 Feb 2024 11:57:31 +0000</pubDate><author>cap@blackett.lol (blackett)</author>
+      <guid>http://0.0.0.0:1313/posts/starting_out/</guid>
+      <description>Ahoy there. All too often I see kids in our Discord server who want to get started learning tech but have no clue how to begin. That&amp;rsquo;s okay, it&amp;rsquo;s not an easy question to know the answer to unless you already work in tech.&#xA;Many seem to have misunderstood and think that ethical hacking is the starting point. Sadly, following endless YouTube tutorials only shows you how to do the things depicted in the tutorials and teaches you none of the underlying context, problem solving skills, and analysis required to be an ethical hacker.</description>
+    </item>
+    <item>
+      <title>Good Questions</title>
+      <link>http://0.0.0.0:1313/posts/good_questions/</link>
+      <pubDate>Wed, 07 Feb 2024 23:18:07 +0000</pubDate><author>cap@blackett.lol (blackett)</author>
+      <guid>http://0.0.0.0:1313/posts/good_questions/</guid>
+      <description>What Is A Bad Question? In short, a bad question is one that requires further questions in order for people to answer it.</description>
+    </item>
+    <item>
       <title>Terraforming a Load Balancer in AWS</title>
       <link>http://0.0.0.0:1313/aws/terraform-aws-load-balancer/</link>
       <pubDate>Tue, 06 Feb 2024 20:16:08 +0000</pubDate><author>cap@blackett.lol (blackett)</author>
       <guid>http://0.0.0.0:1313/aws/terraform-aws-load-balancer/</guid>
       <description>About This guide assumes you have already installed and configured the AWS CLI and have Terraform installed on your computer. Throughout the guide are code snippets from the files in this project. To keep you on your toes they require you to input your resource names etc. No brainless copy/paste allowed.&#xA;This proejct was adapted from a blog post by Sharmila S. I went through the project myself and wrote this guide to solidify my understanding of how infrastructure on AWS can be deployed via Terraform.</description>
+    </item>
+    <item>
+      <title>Test Post</title>
+      <link>http://0.0.0.0:1313/posts/test-post/</link>
+      <pubDate>Tue, 06 Feb 2024 18:56:50 +0000</pubDate><author>cap@blackett.lol (blackett)</author>
+      <guid>http://0.0.0.0:1313/posts/test-post/</guid>
+      <description>ahoy there</description>
     </item>
   </channel>
 </rss>
